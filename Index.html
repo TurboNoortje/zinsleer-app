@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zinsleer oefenen</title>
+    <meta name="description" content="Professionele en interactieve tool voor het ontleden van zinnen: persoonsvorm, voorwerpen en bepalingen.">
+    <!-- Favicon Emoji -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        .word-token {
+            display: inline-block;
+            padding: 4px 6px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        .word-token:hover {
+            background-color: #f3f4f6;
+        }
+        .dark .word-token:hover {
+            background-color: #374151;
+        }
+        
+        /* Gestapelde stijlen: deze kunnen tegelijk op 1 woord actief zijn! */
+        .highlight-pv { border: 2px solid #ef4444 !important; border-radius: 50px; }
+        .highlight-onderwerp { border-bottom: 4px double #3b82f6 !important; padding-bottom: 2px; }
+        
+        .highlight-wwg { background-color: #dcfce7; }
+        .dark .highlight-wwg { background-color: #065f46; color: #a7f3d0; }
+        
+        .highlight-nwg { background-color: #fef9c3; }
+        .dark .highlight-nwg { background-color: #854d0e; color: #fef08a; }
+        
+        /* Stijlen voor bepalingen en voorwerpen */
+        .highlight-bwb { background-color: #f3e8ff; border-bottom: 3px solid #c084fc !important; }
+        .dark .highlight-bwb { background-color: #3b0764; border-bottom: 3px solid #9333ea !important; }
+        
+        .highlight-voorwerp { background-color: #f3f4f6; border-bottom: 3px solid #9ca3af !important; }
+        .dark .highlight-voorwerp { background-color: #374151; border-bottom: 3px solid #6b7280 !important; }
+        
+        .highlight-nwd { background-color: #f8fafc; border-bottom: 3px dashed #94a3b8 !important; }
+        .dark .highlight-nwd { background-color: #1e293b; border-bottom: 3px dashed #64748b !important; }
+
+        .tag-container {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+            margin-bottom: 2px;
+            min-height: 16px;
+            min-width: 10px;
+            border-radius: 4px;
+            padding: 2px 4px;
+            color: transparent;
+            transition: all 0.2s;
+        }
+        .has-tag { 
+            color: white; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .tag-bwb { background-color: #a855f7 !important; color: white !important; }
+        .tag-voorwerp { background-color: #6b7280 !important; color: white !important; }
+        .tag-nwd { background-color: #475569 !important; color: white !important; }
+
+        /* Animatie voor de knoppen */
+        .mode-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #guide-sidebar {
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+        .sidebar-closed { transform: translateX(100%); }
+        .sidebar-open { transform: translateX(0); }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex overflow-x-hidden transition-colors duration-200">
+
+    <main class="flex-1 p-4 md:p-8">
+        <div id="app-container" class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 relative transition-colors">
+            
+            <div id="quiz-view">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Zinsleer oefenen</h1>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Kies een zinsdeel (of de gom) en klik op de woorden om de zin <b>volledig</b> te ontleden.</p>
+                    </div>
+                    
+                    <div class="flex gap-2 relative">
+                        <button onclick="toggleSidebar()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 transition flex items-center gap-2">
+                            <span>📖</span> <span class="hidden md:inline">Gids</span>
+                        </button>
+                        
+                        <button id="settings-btn" onclick="toggleSettingsMenu()" class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-white transition shadow">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+
+                        <div id="settings-menu" class="hidden absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-xl border border-gray-100 dark:border-gray-600 z-50 overflow-hidden">
+                            <button onclick="toggleTheme()" class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center justify-between text-gray-700 dark:text-white transition">
+                                <span id="theme-text">Donker thema</span>
+                                <span id="theme-icon">🌙</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Functieknoppen -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/50">
+                        <span class="block text-xs font-bold text-red-800 dark:text-red-400 mb-2 uppercase">Kernonderdelen</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btn-PV" onclick="setMode('PV')" class="mode-btn px-3 py-1 bg-white dark:bg-gray-800 border border-red-500 text-red-600 dark:text-red-400 rounded-full text-sm font-bold hover:bg-red-500 hover:text-white transition">PV</button>
+                            <button id="btn-O" onclick="setMode('O')" class="mode-btn px-3 py-1 bg-white dark:bg-gray-800 border border-blue-500 text-blue-600 dark:text-blue-400 rounded-full text-sm font-bold hover:bg-blue-500 hover:text-white transition">Onderwerp</button>
+                            <button id="btn-WWG" onclick="setMode('WWG')" class="mode-btn px-3 py-1 bg-green-500 text-white rounded text-sm font-bold hover:bg-green-600 transition">WWG</button>
+                            <button id="btn-NWG" onclick="setMode('NWG')" class="mode-btn px-3 py-1 bg-yellow-400 text-gray-800 rounded text-sm font-bold hover:bg-yellow-500 transition">NWG</button>
+                            <button id="btn-NWD" onclick="setMode('NWD')" class="mode-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-white rounded text-xs font-bold hover:bg-gray-300 transition border border-gray-300 dark:border-gray-600">NWD</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <div class="flex-1 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <span class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase">Voorwerpen</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="btn-LV" onclick="setMode('LV')" class="mode-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-white rounded text-xs font-bold hover:bg-gray-300 transition">LV</button>
+                                <button id="btn-MV" onclick="setMode('MV')" class="mode-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-white rounded text-xs font-bold hover:bg-gray-300 transition">MV</button>
+                                <button id="btn-HV" onclick="setMode('HV')" class="mode-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-white rounded text-xs font-bold hover:bg-gray-300 transition">HV</button>
+                                <button id="btn-VZV" onclick="setMode('VZV')" class="mode-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-white rounded text-xs font-bold hover:bg-gray-300 transition">VZV</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center pl-1">
+                            <button id="btn-GOM" onclick="setMode('GOM')" class="mode-btn h-12 w-12 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all shadow-sm flex items-center justify-center relative cursor-pointer" title="Gom (wis modus)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-900/50 md:col-span-2 shadow-sm transition-colors">
+                        <span class="block text-xs font-bold text-purple-800 dark:text-purple-400 mb-2 uppercase tracking-wider">Bijwoordelijke Bepalingen</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btn-BEP-TIJD" onclick="setMode('BEP. TIJD')" class="mode-btn px-2 py-1 bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 dark:hover:bg-purple-700 transition">bep. tijd</button>
+                            <button id="btn-BEP-PLAATS" onclick="setMode('BEP. PLAATS')" class="mode-btn px-2 py-1 bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 dark:hover:bg-purple-700 transition">bep. plaats</button>
+                            <button id="btn-BEP-WIJZE" onclick="setMode('BEP. WIJZE')" class="mode-btn px-2 py-1 bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 dark:hover:bg-purple-700 transition">bep. wijze</button>
+                            <button id="btn-BEP-MIDDEL" onclick="setMode('BEP. MIDDEL')" class="mode-btn px-2 py-1 bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 dark:hover:bg-purple-700 border border-purple-300 dark:border-purple-600 transition">bep. middel</button>
+                            <button id="btn-BEP-REDEN" onclick="setMode('BEP. REDEN')" class="mode-btn px-2 py-1 bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 dark:hover:bg-purple-700 transition">bep. reden</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zin -->
+                <div id="sentence-container" class="text-xl dark:text-white leading-loose mb-6 min-h-[140px] p-6 border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg flex flex-wrap items-end gap-x-1 gap-y-8 shadow-inner"></div>
+
+                <!-- Feedback -->
+                <div id="feedback-area" class="mb-6 p-4 rounded-lg hidden">
+                    <p id="feedback-text" class="text-sm font-medium"></p>
+                </div>
+
+                <!-- Navigatie -->
+                <div class="flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-6 flex-wrap gap-4">
+                    <div class="flex gap-2">
+                        <button onclick="prevSentence()" id="prev-btn" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg font-bold hover:bg-gray-200 transition">Vorige</button>
+                        <button onclick="nextSentence()" id="next-btn" class="px-4 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg font-bold hover:bg-blue-200 transition">Volgende</button>
+                    </div>
+                    
+                    <div class="flex gap-2 ml-auto">
+                        <button onclick="showSolution()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg font-bold hover:bg-gray-50 transition text-sm">Oplossing</button>
+                        <button onclick="checkAnswer()" class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md transform active:scale-95 transition">Controleer</button>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button onclick="clearSentence()" class="text-xs text-red-400 hover:text-red-600 transition underline">Markeringen van deze zin wissen</button>
+                </div>
+            </div>
+
+            <!-- Eindscherm -->
+            <div id="result-view" class="hidden text-center py-8">
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">Goed gedaan!</h2>
+                <div class="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-8" id="final-score">0 / 1000 correct!</div>
+                <button onclick="restartQuiz()" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg transition">Nieuwe Start</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar Gids -->
+    <aside id="guide-sidebar" class="fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl sidebar-closed overflow-y-auto border-l border-gray-200 dark:border-gray-800 transition-colors z-50">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-blue-800 dark:text-blue-400">Hulp bij Ontleden</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-red-500 text-2xl transition">&times;</button>
+            </div>
+            
+            <div class="space-y-6 text-sm">
+                
+                <section>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 uppercase text-xs mb-2">De Gouden Volgorde</h3>
+                    <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                        <li>PV</li>
+                        <li>Gezegde (WWG / NWG)</li>
+                        <li>Onderwerp</li>
+                        <li>Lijdend Voorwerp</li>
+                        <li>Meewerkend Voorwerp</li>
+                        <li>Overig: BWB, VZV, HV</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3 class="font-bold text-red-800 dark:text-red-400 uppercase text-xs mb-2">Persoonsvorm & Gezegde</h3>
+                    <div class="bg-red-50 dark:bg-red-900/40 p-3 rounded border border-red-100 dark:border-red-900/50 space-y-2">
+                        <p class="text-gray-700 dark:text-gray-200"><b>PV:</b> Maak van de zin een <b>ja-nee-vraag</b>. Het woord dat vooraan komt te staan, is de persoonsvorm.</p>
+                        <p class="text-gray-700 dark:text-gray-200"><b>NWG:</b> Bevat een koppelwerkwoord (zijn, worden, blijven...). Daarbij hoort altijd een <b>NWD (Naamwoordelijk Deel)</b> dat een eigenschap aangeeft (bijv. "Hij is <i>ziek</i>").</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="font-bold text-blue-800 dark:text-blue-400 uppercase text-xs mb-2">Onderwerp & Voorwerpen</h3>
+                    <div class="space-y-2 text-gray-700 dark:text-gray-300">
+                        <p><b>Onderwerp (O):</b> Wie/wat + gezegde?</p>
+                        <p><b>Lijdend Vw (LV):</b> Wie/wat + gezegde + O?</p>
+                        <p><b>Meewerkend Vw (MV):</b> Aan/voor wie + gezegde + O + LV?</p>
+                        <p><b>Handelend Vw (HV):</b> Door wie in een passieve zin?</p>
+                        <p><b>Voorzetsel Vw (VZV):</b> Vast voorzetsel bij werkwoord (wachten <i>op</i>).</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="font-bold text-purple-800 dark:text-purple-400 uppercase text-xs mb-2">Bepalingen (BWB)</h3>
+                    <ul class="space-y-1 text-gray-700 dark:text-gray-300">
+                        <li><b>bep. tijd:</b> Wanneer?</li>
+                        <li><b>bep. plaats:</b> Waar?</li>
+                        <li><b>bep. wijze:</b> Hoe?</li>
+                        <li><b>bep. middel:</b> Waarmee? (instrument)</li>
+                        <li><b>bep. reden:</b> Waarom? (oorzaak)</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        // --- PROFESSIONELE ZINNEN ENGINE (Grammatica & Logica) ---
+        
+        const semanticConcepts = [
+            // 1 t/m 5: TRANSITIEVE ZINNEN (Actie + Object)
+            { type: 'trans',
+              subj_ev: ["de chef-kok", "onze nieuwe kok", "mijn broer", "de slager"], 
+              subj_mv: ["de bekwame koks", "onze koks", "die mannen", "de bakkers"],
+              v: ["snijdt", "sneed", "snijden", "sneden", "gesneden", "heeft"],
+              lv_ev: ["de verse groente", "het grote stuk vlees", "deze lekkere taart", "het brood"], 
+              lv_mv: ["de verse groenten", "die grote uien", "de tomaten", "de broden"],
+              hv: "door de kok", 
+              plaats: ["in de grote keuken", "op het schone aanrecht", "bij de wasbak"], 
+              middel: ["met een vlijmscherp mes", "met het kleine mesje"]
+            },
+            { type: 'trans',
+              subj_ev: ["de oude schrijver", "die beroemde auteur", "de student"], 
+              subj_mv: ["de succesvolle schrijvers", "de auteurs", "mijn klasgenoten"],
+              v: ["schrijft", "schreef", "schrijven", "schreven", "geschreven", "heeft"],
+              lv_ev: ["dat spannende boek", "een nieuwe roman", "dit lange verhaal"], 
+              lv_mv: ["die lange verhalen", "deze boeken", "veel gedichten"],
+              hv: "door de schrijver", 
+              tijd: ["al jaren", "vroeger", "elke dag", "sinds vorig jaar"],
+              plaats: ["in zijn donkere werkkamer", "aan zijn bureau", "in de bibliotheek"], 
+              middel: ["met een oude typemachine", "met een dure vulpen", "op de computer"]
+            },
+            { type: 'trans',
+              subj_ev: ["de ervaren arts", "onze dokter", "de verpleegkundige"], 
+              subj_mv: ["de artsen", "de doktoren", "de specialisten"],
+              v: ["onderzoekt", "onderzocht", "onderzoeken", "onderzochten", "onderzocht", "heeft"],
+              lv_ev: ["die zieke patiënt", "het gebroken been", "dit vervelende virus"], 
+              lv_mv: ["de bezorgde patiënten", "de testresultaten"],
+              hv: "door de arts", 
+              tijd: ["vanochtend", "vorig jaar", "direct", "nauwkeurig"],
+              plaats: ["in het streekziekenhuis", "in de moderne operatiekamer", "op de spoedeisende hulp"], 
+              middel: ["met een stethoscoop", "met speciale medische apparatuur"]
+            },
+            { type: 'trans',
+              subj_ev: ["de handige monteur", "de buurman", "de klusjesman"], 
+              subj_mv: ["die monteurs", "de mannen", "onze buren"],
+              v: ["repareert", "repareerde", "repareren", "repareerden", "gerepareerd", "heeft"],
+              lv_ev: ["deze kapotte auto", "het grote apparaat", "mijn lekkende fiets"], 
+              lv_mv: ["de wasmachines", "onze fietsen", "de motoren"],
+              hv: "door de monteur", 
+              tijd: ["gistermiddag", "vandaag", "vliegensvlug"],
+              plaats: ["in de rommelige garage", "buiten op straat", "in de werkplaats"], 
+              middel: ["met zijn zware gereedschap", "met een grote moersleutel"]
+            },
+            { type: 'trans',
+              subj_ev: ["onze vriendelijke buurman", "de trotse eigenaar", "mijn vader"], 
+              subj_mv: ["de buren", "mijn vrienden", "de medewerkers"],
+              v: ["wast", "waste", "wassen", "wasten", "gewassen", "heeft"],
+              lv_ev: ["zijn glimmende auto", "de oude bestelbus", "de vloer"], 
+              lv_mv: ["de vieze ramen", "onze fietsen", "alle glazen"],
+              hv: "door de eigenaar", 
+              tijd: ["elk weekend", "gisteren", "vaak"],
+              plaats: ["op de oprit", "voor het grote huis", "in de wasstraat"], 
+              middel: ["met heel veel zeep", "met een grote spons", "met warm water"]
+            },
+            
+            // 6 t/m 8: GEVEN (Transitieven met Meewerkend Voorwerp)
+            { type: 'geven',
+              subj_ev: ["de gulle leraar", "de docent", "mijn trainer"], 
+              subj_mv: ["de leraren", "onze docenten", "de coaches"],
+              v: ["geeft", "gaf", "geven", "gaven", "gegeven", "heeft"],
+              mv: ["aan de slimme leerling", "aan de hele klas", "aan het stille meisje"],
+              lv_ev: ["dat mooie compliment", "een nuttige tip", "extra huiswerk"], 
+              lv_mv: ["die hoge cijfers", "de lastige toetsen", "goede adviezen"],
+              hv: "door de docent", 
+              tijd: ["tijdens de les", "gisteren", "vandaag"],
+              plaats: ["in het lokaal", "op school", "in de gang"]
+            },
+            { type: 'geven',
+              subj_ev: ["mijn moeder", "de aardige oom", "onze tante"], 
+              subj_mv: ["mijn ouders", "onze familieleden", "de grootouders"],
+              v: ["koopt", "kocht", "kopen", "kochten", "gekocht", "heeft"],
+              mv: ["voor mijn kleine broertje", "voor de lieve kinderen", "voor het hele gezin"],
+              lv_ev: ["dat prachtige cadeau", "een grote verrassing", "een nieuwe fiets"], 
+              lv_mv: ["deze nieuwe schoenen", "leuke cadeautjes", "verse broodjes"],
+              hv: "door mijn moeder", 
+              tijd: ["voor zijn verjaardag", "gisteren", "altijd"],
+              plaats: ["in de grote speelgoedwinkel", "in het drukke winkelcentrum", "op de zaterdagmarkt"]
+            },
+            { type: 'geven',
+              subj_ev: ["de snelle koerier", "de postbode", "de bezorger"], 
+              subj_mv: ["de bezorgers", "de koeriers", "de pakketbezorgers"],
+              v: ["brengt", "bracht", "brengen", "brachten", "gebracht", "heeft"],
+              mv: ["aan de bewoners", "aan de vaste klant", "aan de buren"],
+              lv_ev: ["dat belangrijke pakket", "een grote doos", "de aangetekende brief"], 
+              lv_mv: ["die verse boodschappen", "de zware dozen", "de rekeningen"],
+              hv: "door de koerier", 
+              tijd: ["vanochtend", "gisteravond", "zojuist"],
+              plaats: ["bij de voordeur", "in de smalle hal", "op het postkantoor"]
+            },
+
+            // 9 t/m 11: KOPPELWERKWOORDEN (NWG + Naamwoordelijk Deel)
+            { type: 'koppel',
+              subj_ev: ["mijn allerbeste vriend", "die onbekende man", "onze buurjongen"], 
+              subj_mv: ["mijn goede vrienden", "deze hardwerkende mannen", "de atleten"],
+              v: ["wordt", "werd", "worden", "werden", "geworden", "is"],
+              nwd_ev: ["een beroemde piloot", "erg ziek", "zeer succesvol"], 
+              nwd_mv: ["beroemde piloten", "erg ziek", "zeer succesvol"],
+              tijd: ["vorig jaar", "binnenkort", "plotseling"],
+              plaats: ["in Amerika", "hier thuis", "in het buitenland"]
+            },
+            { type: 'koppel',
+              subj_ev: ["deze lastige toets", "het eindexamen", "die grote opdracht"], 
+              subj_mv: ["deze lange toetsen", "de zware examens", "die taken"],
+              v: ["lijkt", "leek", "lijken", "leken", "geleken", "heeft"],
+              nwd_ev: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk"], 
+              nwd_mv: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk"],
+              tijd: ["vandaag", "gisteren", "tijdens de les", "vaak"],
+              plaats: ["in de klas", "op school", "in het lokaal"]
+            },
+            { type: 'koppel',
+              subj_ev: ["de bekende zanger", "die jonge muzikant", "de acteur"], 
+              subj_mv: ["de artiesten", "die populaire muzikanten", "de dansers"],
+              v: ["blijft", "bleef", "blijven", "bleven", "gebleven", "is"],
+              nwd_ev: ["bijzonder populair", "altijd erg bescheiden", "een groot natuurtalent"], 
+              nwd_mv: ["bijzonder populair", "altijd erg bescheiden", "grote talenten"],
+              tijd: ["al jarenlang", "tegenwoordig", "nog steeds"],
+              plaats: ["in eigen land", "over de hele wereld", "op het podium"]
+            },
+
+            // 12 t/m 13: VOORZETSELVOORWERPEN (VZV)
+            { type: 'vzv',
+              subj_ev: ["de student", "die ongeduldige vrouw", "de toerist"], 
+              subj_mv: ["de studenten", "de vrouwen", "de passagiers"],
+              v: ["wacht", "wachtte", "wachten", "wachtten", "gewacht", "heeft"],
+              vzv: ["op de belangrijke uitslag", "op de volgende bus", "op de zwaar vertraagde trein"],
+              tijd: ["al urenlang", "de hele ochtend", "sinds gisteren"],
+              plaats: ["in de koude wachtruimte", "bij de halte", "op het tochtige perron"], 
+              wijze: ["vol ongeduld", "met heel veel spanning", "rustig"]
+            },
+            { type: 'vzv',
+              subj_ev: ["de detective", "de politie", "de journalist"], 
+              subj_mv: ["de rechercheurs", "onze agenten", "die mensen"],
+              v: ["twijfelt", "twijfelde", "twijfelen", "twijfelden", "getwijfeld", "heeft"],
+              vzv: ["aan dat vreemde verhaal", "aan de onschuldige verdachte", "aan de gevonden bewijzen"],
+              tijd: ["nog steeds", "gisteren", "tijdens het lange verhoor", "vaak"],
+              plaats: ["op het drukke politiebureau", "in de verhoorkamer", "in de rechtszaal"], 
+              wijze: ["heel erg sterk", "volledig terecht", "openlijk"]
+            },
+
+            // 14 t/m 15: INTRANSITIEVE ZINNEN (Geen lijdend voorwerp)
+            { type: 'intrans',
+              subj_ev: ["de eenzame oude man", "mijn opa", "die vreemdeling"], 
+              subj_mv: ["de oude mannen", "het verliefde stelletje", "de wandelaars"],
+              v: ["wandelt", "wandelde", "wandelen", "wandelden", "gewandeld", "heeft"],
+              tijd: ["elke avond", "gisteren", "vaak"],
+              plaats: ["in het donkere bos", "door het enorme stadspark", "langs het kanaal"], 
+              wijze: ["erg langzaam", "met zeer veel moeite", "in een stevig tempo"]
+            },
+            { type: 'intrans',
+              subj_ev: ["de waakhond", "onze hond", "de buurhond"], 
+              subj_mv: ["die grote waakhonden", "de honden van de boer"],
+              v: ["blaft", "blafte", "blaffen", "blaften", "geblaft", "heeft"],
+              tijd: ["de hele nacht", "plotseling", "vaak"],
+              plaats: ["in de modderige achtertuin", "voor de afgesloten deur", "op het erf"], 
+              wijze: ["ontzettend luid", "bijzonder angstaanjagend", "onophoudelijk"]
+            }
+        ];
+
+        // --- SAFE RANDOM FUNCTION ---
+        function rnd(arr) { 
+            if (!arr || !Array.isArray(arr) || arr.length === 0) return "";
+            return arr[Math.floor(Math.random() * arr.length)]; 
+        }
+
+        function capitalize(str) { 
+            return str ? str.charAt(0).toUpperCase() + str.slice(1) : ""; 
+        }
+
+        class SentenceBuilder {
+            constructor() {
+                this.tokens = [];
+                this.roles = {};
+            }
+            add(phrase, roleStr) {
+                if (!phrase) return;
+                const words = phrase.split(" ");
+                const startIndex = this.tokens.length;
+                this.tokens.push(...words);
+                const indices = Array.from({length: words.length}, (_, k) => startIndex + k);
+                
+                let rolesList = roleStr.split(',');
+                rolesList.forEach(role => {
+                    let r = role.trim();
+                    if (r === "WWG_PART") {
+                        if(!this.roles.WWG) this.roles.WWG = [];
+                        this.roles.WWG.push(...indices);
+                    } else if (r === "NWG_PART") {
+                        if(!this.roles.NWG) this.roles.NWG = [];
+                        this.roles.NWG.push(...indices);
+                    } else if (r) {
+                        if(!this.roles[r]) this.roles[r] = [];
+                        this.roles[r].push(...indices);
+                    }
+                });
+            }
+            finalize(punctuation) {
+                if (this.tokens.length === 0) return null;
+                this.tokens[0] = capitalize(this.tokens[0]); // Zorgt dat elke zin perfect met een hoofdletter begint
+                let text = this.tokens.join(" ") + punctuation;
+                return { text, roles: this.roles };
+            }
+        }
+
+        // De Masterclass Grammatica Generator
+        function generateProSentences() {
+            let pool = [];
+            
+            for (let i = 0; i < 1000; i++) {
+                let c = rnd(semanticConcepts);
+                let tense = rnd([0, 1, 2]); // 0: Tegenwoordig, 1: Verleden, 2: Voltooid
+                let num = rnd([0, 1]);      // 0: Enkelvoud, 1: Meervoud
+                let form = rnd(['normaal', 'inversie', 'vraag']);
+                let voice = rnd(['actief', 'passief']);
+
+                // Een zin kan alleen passief worden als er een object (LV/Trans) is
+                if (voice === 'passief' && c.type !== 'trans' && c.type !== 'geven') voice = 'actief';
+
+                let sb = new SentenceBuilder();
+                let isVraag = form === 'vraag';
+
+                // Tijdwoorden die strikt gebonden zijn aan de gekozen tijd
+                let time = null;
+                if (tense === 0) time = rnd(["vandaag", "soms", "vaak", "tegenwoordig", "nu", "altijd"]);
+                else if (tense === 1) time = rnd(["gisteren", "vroeger", "vorige week", "vorig jaar", "gisteravond"]);
+                else if (tense === 2) time = rnd(["vandaag", "zojuist", "al vaker", "onlangs", "recent", "net"]);
+
+                // Vormen PV selecteren
+                let pv_actief = tense === 0 ? c.v[num*2] : (tense === 1 ? c.v[1+num*2] : (num===0 ? c.v[5] : (c.v[5]==='heeft'?'hebben':'zijn')));
+                let part = c.v[4]; // Voltooid deelwoord (bijv. "gekocht")
+
+                let subj = num === 0 ? rnd(c.subj_ev) : rnd(c.subj_mv);
+                let lvNum = rnd([0, 1]); // Lijdend voorwerp kan in beide aantallen voorkomen
+                let lv = lvNum === 0 ? rnd(c.lv_ev) : rnd(c.lv_mv); 
+                
+                let place = rnd(c.plaats);
+                let mid = rnd(c.middel);
+                let w = rnd(c.wijze);
+                let mv = rnd(c.mv);
+                let vzv = rnd(c.vzv);
+                let nwd = num === 0 ? rnd(c.nwd_ev) : rnd(c.nwd_mv);
+
+                // Bij passief wordt het Lijdend Voorwerp het Onderwerp. We sturen de PV daarop aan.
+                let pv_passief = tense === 0 ? (lvNum === 0 ? 'wordt' : 'worden') : (tense === 1 ? (lvNum === 0 ? 'werd' : 'werden') : (lvNum === 0 ? 'is' : 'zijn'));
+                let baseSubj = voice === 'actief' ? subj : lv; 
+
+                // --- 1. FRONT VELD (Begin van de zin) ---
+                if (form === 'normaal') {
+                    sb.add(baseSubj, "O");
+                    sb.add((voice === 'actief' ? pv_actief : pv_passief), "PV,WWG");
+                } else if (form === 'inversie') {
+                    let timeOrPlace = null;
+                    if(time && Math.random() > 0.3) { timeOrPlace = {w: time, r: "BEP. TIJD"}; time = null; }
+                    else if(place) { timeOrPlace = {w: place, r: "BEP. PLAATS"}; place = null; }
+                    
+                    if (timeOrPlace) {
+                        sb.add(timeOrPlace.w, timeOrPlace.r);
+                        sb.add((voice === 'actief' ? pv_actief : pv_passief), "PV,WWG");
+                        sb.add(baseSubj, "O");
+                    } else {
+                        // Terugval als we geen inversie woord hadden
+                        sb.add(baseSubj, "O");
+                        sb.add((voice === 'actief' ? pv_actief : pv_passief), "PV,WWG");
+                        form = 'normaal'; 
+                    }
+                } else { // vraag
+                    sb.add((voice === 'actief' ? pv_actief : pv_passief), "PV,WWG");
+                    sb.add(baseSubj, "O");
+                }
+
+                // --- 2. MIDDENVELD (Strikte Nederlandse Volgorde) ---
+                // Volgorde in het Nederlands is vaak: Tijd -> Wijze -> Objecten -> Plaats -> VZV
+                
+                // 1. Tijd komt vrijwel altijd eerst in het middenveld
+                if (time && Math.random() > 0.2) sb.add(time, "BEP. TIJD");
+                
+                // 2. Wijze komt vaak vóór de objecten en zeker vóór de plaats
+                if (w && Math.random() > 0.4) sb.add(w, "BEP. WIJZE");
+
+                // 3. Meewerkend Voorwerp
+                if (c.type === 'geven' && mv) sb.add(mv, "MV");
+                
+                // 4. Lijdend Voorwerp (Alleen bij actieve zinnen)
+                if (voice === 'actief' && (c.type === 'trans' || c.type === 'geven') && lv) sb.add(lv, "LV");
+                
+                // 5. Handelend Voorwerp (Alleen bij passieve zinnen)
+                if (voice === 'passief' && c.hv && Math.random() > 0.2) sb.add(c.hv, "HV");
+
+                // 6. Plaats en Middel (staan vaak vrij ver achteraan)
+                if (mid && Math.random() > 0.5) sb.add(mid, "BEP. MIDDEL");
+                if (place && Math.random() > 0.5) sb.add(place, "BEP. PLAATS");
+                
+                // 7. Koppelwerkwoord specifieke delen
+                if (c.type === 'koppel') {
+                    if (sb.roles.PV) {
+                        sb.roles.PV.forEach(idx => {
+                            if(sb.roles.WWG && sb.roles.WWG.includes(idx)) {
+                                sb.roles.NWG = [idx];
+                                sb.roles.WWG = [];
+                            }
+                        });
+                    }
+                    if (nwd) sb.add(nwd, "NWD");
+                }
+                
+                // 8. Voorzetselvoorwerp (Staat vrijwel altijd helemaal achteraan, vlak voor de rest van het werkwoord)
+                if (c.type === 'vzv' && vzv) sb.add(vzv, "VZV");
+                
+                // --- 3. EINDE (Rest van de werkwoorden) ---
+                if (voice === 'passief') {
+                    sb.add(part, "WWG_PART"); // GEEN "geworden" toevoegen in goed Nederlands!
+                } else if (tense === 2) { 
+                    sb.add(part, c.type === 'koppel' ? "NWG_PART" : "WWG_PART");
+                }
+
+                let s = sb.finalize(isVraag ? "?" : ".");
+                if(s) pool.push(s);
+            }
+            
+            return pool; 
+        }
+
+        let sentences = [];
+        let currentIdx = 0;
+        let memory = {};
+        let isDarkTheme = false;
+        let activeMode = null;
+
+        function toggleSettingsMenu() {
+            document.getElementById('settings-menu').classList.toggle('hidden');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            isDarkTheme = !isDarkTheme;
+            html.classList.toggle('dark', isDarkTheme);
+            document.getElementById('theme-text').innerText = isDarkTheme ? 'Licht thema' : 'Donker thema';
+            document.getElementById('theme-icon').innerText = isDarkTheme ? '☀️' : '🌙';
+            localStorage.setItem('zinsleer_theme', isDarkTheme ? 'dark' : 'light');
+            toggleSettingsMenu();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('guide-sidebar');
+            sidebar.classList.toggle('sidebar-closed');
+            sidebar.classList.toggle('sidebar-open');
+        }
+
+        function renderSentence() {
+            const container = document.getElementById('sentence-container');
+            container.innerHTML = '';
+            const words = sentences[currentIdx].text.split(' ');
+            
+            words.forEach((word, i) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col items-center';
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag-container';
+                tagSpan.id = `tag-${i}`;
+                const wordSpan = document.createElement('span');
+                wordSpan.innerText = word;
+                wordSpan.className = 'word-token';
+                wordSpan.id = `word-${i}`;
+                wordSpan.onclick = () => toggleWord(i);
+                wrapper.appendChild(wordSpan);
+                wrapper.appendChild(tagSpan);
+                container.appendChild(wrapper);
+
+                if (memory[currentIdx]?.words[i]) {
+                    const m = memory[currentIdx].words[i];
+                    m.classes.forEach(c => wordSpan.classList.add(c));
+                    if (m.tag) {
+                        tagSpan.innerText = m.tag;
+                        tagSpan.classList.add('has-tag');
+                        if (m.tag.toUpperCase().startsWith('BEP.')) tagSpan.classList.add('tag-bwb');
+                        else if (['LV', 'MV', 'HV', 'VZV'].includes(m.tag.toUpperCase())) tagSpan.classList.add('tag-voorwerp');
+                        else if (m.tag.toUpperCase() === 'NWD') tagSpan.classList.add('tag-nwd');
+                    }
+                }
+            });
+
+            document.getElementById('prev-btn').disabled = currentIdx === 0;
+            document.getElementById('feedback-area').classList.add('hidden');
+            
+            setMode(null);
+        }
+
+        function getBtnId(mode) {
+            if (!mode) return '';
+            return 'btn-' + mode.replace(/\./g, '').replace(/\s+/g, '-').toUpperCase();
+        }
+
+        // Hulpfuncties om classes mooi op een woord te stapelen
+        function toggleInArray(arr, item) {
+            let idx = arr.indexOf(item);
+            if (idx > -1) arr.splice(idx, 1);
+            else arr.push(item);
+        }
+        function removeFromArray(arr, item) {
+            let idx = arr.indexOf(item);
+            if (idx > -1) arr.splice(idx, 1);
+        }
+
+        function toggleWord(i) {
+            if (!activeMode) {
+                const area = document.getElementById('feedback-area');
+                const text = document.getElementById('feedback-text');
+                area.classList.remove('hidden');
+                area.className = "mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800";
+                text.innerHTML = "<b>Kies eerst een zinsdeel!</b> Klik op een knop in het menu (of gom) en daarna pas op de woorden in de zin.";
+                return;
+            }
+
+            if (!memory[currentIdx]) memory[currentIdx] = { words: {}, checked: false };
+            let wMem = memory[currentIdx].words[i] || { classes: [], tag: "" };
+
+            const el = document.getElementById(`word-${i}`);
+            const tagEl = document.getElementById(`tag-${i}`);
+
+            // Nieuwe logica: Stijlen STAPELEN perfect, je kan PV en WWG op hetzelfde woord zetten.
+            if (activeMode === 'GOM') {
+                wMem = { classes: [], tag: "" };
+            } else if (activeMode === 'PV') {
+                toggleInArray(wMem.classes, 'highlight-pv');
+            } else if (activeMode === 'O') {
+                toggleInArray(wMem.classes, 'highlight-onderwerp');
+            } else if (activeMode === 'WWG') {
+                removeFromArray(wMem.classes, 'highlight-nwg');
+                toggleInArray(wMem.classes, 'highlight-wwg');
+            } else if (activeMode === 'NWG') {
+                removeFromArray(wMem.classes, 'highlight-wwg');
+                toggleInArray(wMem.classes, 'highlight-nwg');
+            } else {
+                // TAGS (Zoals LV, Bepalingen, NWD)
+                if (wMem.tag === activeMode) {
+                    wMem.tag = ""; // Uitklikken als hij al actief was
+                    removeFromArray(wMem.classes, 'highlight-bwb');
+                    removeFromArray(wMem.classes, 'highlight-voorwerp');
+                    removeFromArray(wMem.classes, 'highlight-nwd');
+                } else {
+                    wMem.tag = activeMode;
+                    removeFromArray(wMem.classes, 'highlight-bwb');
+                    removeFromArray(wMem.classes, 'highlight-voorwerp');
+                    removeFromArray(wMem.classes, 'highlight-nwd');
+                    
+                    if (activeMode.startsWith('BEP.')) wMem.classes.push('highlight-bwb');
+                    else if (['LV', 'MV', 'HV', 'VZV'].includes(activeMode)) wMem.classes.push('highlight-voorwerp');
+                    else if (activeMode === 'NWD') wMem.classes.push('highlight-nwd');
+                }
+            }
+
+            // Visueel toepassen op het woord in het scherm
+            el.className = 'word-token ' + wMem.classes.join(' ');
+            tagEl.className = 'tag-container'; // Reset classes
+            tagEl.innerText = wMem.tag;
+            if (wMem.tag) {
+                tagEl.classList.add('has-tag');
+                if (wMem.tag.startsWith('BEP.')) tagEl.classList.add('tag-bwb');
+                else if (['LV', 'MV', 'HV', 'VZV'].includes(wMem.tag)) tagEl.classList.add('tag-voorwerp');
+                else if (wMem.tag === 'NWD') tagEl.classList.add('tag-nwd');
+            } else {
+                tagEl.classList.remove('has-tag');
+            }
+
+            // Opslaan of opschonen uit geheugen
+            if (wMem.classes.length === 0 && wMem.tag === "") {
+                delete memory[currentIdx].words[i];
+            } else {
+                memory[currentIdx].words[i] = wMem;
+            }
+        }
+
+        function setMode(mode) {
+            activeMode = mode;
+            
+            // Dim alle knoppen en verwijder de actieve ring
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-blue-500', 'dark:ring-blue-400', 'ring-offset-2', 'dark:ring-offset-gray-800', 'scale-110', 'z-10', 'shadow-lg');
+                btn.classList.add('opacity-60', 'hover:opacity-100'); // Maak inactieve knoppen wat doorzichtig
+            });
+
+            if (mode) {
+                const activeBtn = document.getElementById(getBtnId(mode));
+                if (activeBtn) {
+                    // Haal het dim-effect weg bij de actieve knop en maak hem groot met een dikke rand!
+                    activeBtn.classList.remove('opacity-60', 'hover:opacity-100');
+                    activeBtn.classList.add('ring-4', 'ring-blue-500', 'dark:ring-blue-400', 'ring-offset-2', 'dark:ring-offset-gray-800', 'scale-110', 'z-10', 'shadow-lg');
+                }
+            }
+        }
+
+        // Strenge, volledige controle van ALLE aangeduide zinsdelen
+        function checkAnswer() {
+            const truthData = sentences[currentIdx].roles;
+            let userMarks = { PV: [], O: [], WWG: [], NWG: [] };
+            
+            const words = memory[currentIdx]?.words || {};
+            for(let i in words) {
+                let w = words[i];
+                let idx = parseInt(i);
+                if (w.classes.includes('highlight-pv')) userMarks.PV.push(idx);
+                if (w.classes.includes('highlight-onderwerp')) userMarks.O.push(idx);
+                if (w.classes.includes('highlight-wwg')) userMarks.WWG.push(idx);
+                if (w.classes.includes('highlight-nwg')) userMarks.NWG.push(idx);
+                if (w.tag && w.tag.trim() !== '') {
+                    let tag = w.tag.toUpperCase();
+                    if (!userMarks[tag]) userMarks[tag] = [];
+                    userMarks[tag].push(idx);
+                }
+            }
+            
+            let isCorrect = true;
+            let missingRoles = false;
+            
+            // Check 1: Heeft de gebruiker foute of te veel woorden aangeduid?
+            for (let role in userMarks) {
+                if (userMarks[role].length > 0) {
+                    let truth = truthData[role] || [];
+                    if (userMarks[role].sort().join(',') !== truth.sort().join(',')) {
+                        isCorrect = false;
+                    }
+                }
+            }
+            
+            // Check 2: Heeft de gebruiker verplichte zinsdelen in de zin overgeslagen?
+            for (let role in truthData) {
+                if (!userMarks[role] || userMarks[role].length === 0) {
+                    if (truthData[role].length > 0) missingRoles = true;
+                } else {
+                    let truth = truthData[role];
+                    if (userMarks[role].sort().join(',') !== truth.sort().join(',')) {
+                        isCorrect = false;
+                    }
+                }
+            }
+
+            const area = document.getElementById('feedback-area');
+            const text = document.getElementById('feedback-text');
+            area.classList.remove('hidden');
+
+            if (isCorrect && !missingRoles) {
+                if (!memory[currentIdx]) memory[currentIdx] = {};
+                memory[currentIdx].checked = true;
+                memory[currentIdx].correct = true;
+                
+                area.className = "mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800";
+                text.innerHTML = "<b>Fantastisch!</b> Je hebt de zin perfect en volledig ontleed.";
+            } else if (isCorrect && missingRoles) {
+                area.className = "mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800";
+                text.innerHTML = "<b>Goed op weg!</b> De woorden die je hebt aangeduid kloppen perfect, maar je bent nog enkele zinsdelen vergeten te zoeken in deze zin.";
+            } else {
+                if (!memory[currentIdx]) memory[currentIdx] = {};
+                memory[currentIdx].checked = true;
+                memory[currentIdx].correct = false;
+                
+                area.className = "mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800";
+                text.innerHTML = "<b>Er klopt iets niet.</b> Je hebt foute woorden aangeduid, of je hebt de verkeerde knop gebruikt voor een woord. Wis je foutjes met de Gom en probeer het nog eens.";
+            }
+        }
+
+        function showSolution() {
+            const data = sentences[currentIdx].roles;
+            if (!memory[currentIdx]) memory[currentIdx] = { words: {} };
+            
+            // Alles eerst even helemaal schoonmaken
+            const words = sentences[currentIdx].text.split(' ');
+            words.forEach((_, i) => {
+                const el = document.getElementById(`word-${i}`);
+                const tagEl = document.getElementById(`tag-${i}`);
+                el.className = 'word-token';
+                tagEl.innerText = '';
+                tagEl.classList.remove('has-tag');
+                if (memory[currentIdx].words) memory[currentIdx].words[i] = { classes: [], tag: "" };
+            });
+            
+            // Perfecte stapeling van de juiste classes via de Oplossing knop
+            for (let role in data) {
+                let indices = data[role];
+                indices.forEach(i => {
+                    const el = document.getElementById(`word-${i}`);
+                    const tagEl = document.getElementById(`tag-${i}`);
+                    
+                    if(!memory[currentIdx].words[i]) memory[currentIdx].words[i] = { classes: [], tag: "" };
+                    
+                    if (role === 'PV') el.classList.add('highlight-pv');
+                    else if (role === 'O') el.classList.add('highlight-onderwerp');
+                    else if (role === 'WWG') el.classList.add('highlight-wwg');
+                    else if (role === 'NWG') el.classList.add('highlight-nwg');
+                    else {
+                        let label = role;
+                        if(role.startsWith('BEP.')) {
+                            label = role.toLowerCase(); // Mooie lowercase voor bepalingen
+                            el.classList.add('highlight-bwb');
+                            tagEl.classList.add('tag-bwb');
+                        } else if (['LV', 'MV', 'HV', 'VZV'].includes(role)) {
+                            el.classList.add('highlight-voorwerp');
+                            tagEl.classList.add('tag-voorwerp');
+                        } else if (role === 'NWD') {
+                            el.classList.add('highlight-nwd');
+                            tagEl.classList.add('tag-nwd');
+                        }
+                        tagEl.innerText = label;
+                        tagEl.classList.add('has-tag');
+                    }
+                    
+                    memory[currentIdx].words[i].classes = Array.from(el.classList).filter(c => c.startsWith('highlight-'));
+                    memory[currentIdx].words[i].tag = tagEl.innerText || "";
+                });
+            }
+            
+            checkAnswer();
+        }
+
+        function clearSentence() {
+            delete memory[currentIdx];
+            renderSentence();
+        }
+
+        function nextSentence() {
+            if (currentIdx < sentences.length - 1) {
+                currentIdx++;
+                renderSentence();
+            } else {
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('result-view').classList.remove('hidden');
+                let score = Object.values(memory).filter(m => m.correct).length;
+                document.getElementById('final-score').innerText = `${score} / 1000 correct!`;
+            }
+        }
+
+        function prevSentence() {
+            if (currentIdx > 0) { currentIdx--; renderSentence(); }
+        }
+
+        function restartQuiz() {
+            location.reload();
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('zinsleer_theme');
+            if (saved === 'dark') {
+                isDarkTheme = true;
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-text').innerText = 'Licht thema';
+                document.getElementById('theme-icon').innerText = '☀️';
+            }
+            
+            // Activeer de nieuwe robuuste Grammatica motor!
+            sentences = generateProSentences();
+            
+            // Dim alle knoppen bij het inladen (geen enkele modus actief)
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.add('opacity-60', 'hover:opacity-100');
+            });
+
+            renderSentence();
+        };
+    </script>
+</body>
+</html>
