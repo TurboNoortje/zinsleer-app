@@ -48,8 +48,8 @@
         .highlight-voorwerp { background-color: #f3f4f6; border-bottom: 3px solid #9ca3af !important; }
         .dark .highlight-voorwerp { background-color: #374151; border-bottom: 3px solid #6b7280 !important; }
         
-        .highlight-nwd { background-color: #f8fafc; border-bottom: 3px dashed #94a3b8 !important; }
-        .dark .highlight-nwd { background-color: #1e293b; border-bottom: 3px dashed #64748b !important; }
+        .highlight-nwd { border-bottom: 3px dashed #94a3b8 !important; }
+        .dark .highlight-nwd { border-bottom: 3px dashed #64748b !important; }
 
         .tag-container {
             display: inline-block;
@@ -220,7 +220,7 @@
                     <h3 class="font-bold text-red-800 dark:text-red-400 uppercase text-xs mb-2">Persoonsvorm & Gezegde</h3>
                     <div class="bg-red-50 dark:bg-red-900/40 p-3 rounded border border-red-100 dark:border-red-900/50 space-y-2">
                         <p class="text-gray-700 dark:text-gray-200"><b>PV:</b> Maak van de zin een <b>ja-nee-vraag</b>. Het woord dat vooraan komt te staan, is de persoonsvorm.</p>
-                        <p class="text-gray-700 dark:text-gray-200"><b>NWG:</b> Bevat een koppelwerkwoord (zijn, worden, blijven...). Daarbij hoort altijd een <b>NWD (Naamwoordelijk Deel)</b> dat een eigenschap aangeeft (bijv. "Hij is <i>ziek</i>").</p>
+                        <p class="text-gray-700 dark:text-gray-200"><b>NWG:</b> Bestaat uit het koppelwerkwoord <b>én</b> het Naamwoordelijk Deel (NWD). Geef ze dus allemaal de gele NWG-kleur!</p>
                     </div>
                 </section>
 
@@ -349,8 +349,8 @@
               subj_ev: ["mijn allerbeste vriend", "die onbekende man", "onze buurjongen"], 
               subj_mv: ["mijn goede vrienden", "deze hardwerkende mannen", "de atleten"],
               v: ["wordt", "werd", "worden", "werden", "geworden", "is"],
-              nwd_ev: ["een beroemde piloot", "erg ziek", "zeer succesvol"], 
-              nwd_mv: ["beroemde piloten", "erg ziek", "zeer succesvol"],
+              nwd_ev: ["een beroemde piloot", "erg ziek", "zeer succesvol", "een groot voorbeeld"], 
+              nwd_mv: ["beroemde piloten", "erg ziek", "zeer succesvol", "grote voorbeelden"],
               tijd: ["vorig jaar", "binnenkort", "plotseling"],
               plaats: ["in Amerika", "hier thuis", "in het buitenland"]
             },
@@ -358,8 +358,8 @@
               subj_ev: ["deze lastige toets", "het eindexamen", "die grote opdracht"], 
               subj_mv: ["deze lange toetsen", "de zware examens", "die taken"],
               v: ["lijkt", "leek", "lijken", "leken", "geleken", "heeft"],
-              nwd_ev: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk"], 
-              nwd_mv: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk"],
+              nwd_ev: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk", "best lastig"], 
+              nwd_mv: ["behoorlijk pittig", "erg makkelijk", "vrijwel onmogelijk", "best lastig"],
               tijd: ["vandaag", "gisteren", "tijdens de les", "vaak"],
               plaats: ["in de klas", "op school", "in het lokaal"]
             },
@@ -367,8 +367,8 @@
               subj_ev: ["de bekende zanger", "die jonge muzikant", "de acteur"], 
               subj_mv: ["de artiesten", "die populaire muzikanten", "de dansers"],
               v: ["blijft", "bleef", "blijven", "bleven", "gebleven", "is"],
-              nwd_ev: ["bijzonder populair", "altijd erg bescheiden", "een groot natuurtalent"], 
-              nwd_mv: ["bijzonder populair", "altijd erg bescheiden", "grote talenten"],
+              nwd_ev: ["bijzonder populair", "altijd erg bescheiden", "een groot natuurtalent", "enorm grappig"], 
+              nwd_mv: ["bijzonder populair", "altijd erg bescheiden", "grote talenten", "enorm grappig"],
               tijd: ["al jarenlang", "tegenwoordig", "nog steeds"],
               plaats: ["in eigen land", "over de hele wereld", "op het podium"]
             },
@@ -547,15 +547,14 @@
                 
                 // 7. Koppelwerkwoord specifieke delen
                 if (c.type === 'koppel') {
-                    if (sb.roles.PV) {
-                        sb.roles.PV.forEach(idx => {
-                            if(sb.roles.WWG && sb.roles.WWG.includes(idx)) {
-                                sb.roles.NWG = [idx];
-                                sb.roles.WWG = [];
-                            }
-                        });
+                    // Zet alle bestaande werkwoorden (WWG) om naar NWG
+                    if (sb.roles.WWG && sb.roles.WWG.length > 0) {
+                        if (!sb.roles.NWG) sb.roles.NWG = [];
+                        sb.roles.NWG.push(...sb.roles.WWG);
+                        sb.roles.WWG = [];
                     }
-                    if (nwd) sb.add(nwd, "NWD");
+                    // Het NWD hoort óók bij het NWG!
+                    if (nwd) sb.add(nwd, "NWD,NWG_PART");
                 }
                 
                 // 8. Voorzetselvoorwerp (Staat vrijwel altijd helemaal achteraan, vlak voor de rest van het werkwoord)
