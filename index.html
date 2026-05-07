@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zinsleer oefenen</title>
     <meta name="description" content="Professionele en interactieve tool voor het ontleden van zinnen: persoonsvorm, voorwerpen en bepalingen.">
-    <!-- Favicon Emoji -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>Z</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
@@ -15,7 +15,7 @@
         .word-token {
             display: inline-block;
             padding: 4px 6px;
-            margin: 4px 2px;
+            margin: 0;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.1s;
@@ -27,21 +27,21 @@
         
         .highlight-pv { border: 2px solid #ef4444 !important; border-radius: 50px; }
         .highlight-onderwerp { border-bottom: 4px double #3b82f6 !important; padding-bottom: 2px; }
-        .highlight-wwg { background-color: #dcfce7; }
-        .dark .highlight-wwg { background-color: #065f46; color: #a7f3d0; }
-        .highlight-nwg { background-color: #fef9c3; }
-        .dark .highlight-nwg { background-color: #854d0e; color: #fef08a; }
         
-        .highlight-bwb { background-color: #f3e8ff; border-bottom: 3px solid #c084fc !important; }
-        .dark .highlight-bwb { background-color: #3b0764; border-bottom: 3px solid #9333ea !important; }
-        .highlight-voorwerp { background-color: #f3f4f6; border-bottom: 3px solid #9ca3af !important; }
-        .dark .highlight-voorwerp { background-color: #374151; border-bottom: 3px solid #6b7280 !important; }
-        .highlight-nwd { border-bottom: 3px dashed #94a3b8 !important; }
-        .dark .highlight-nwd { border-bottom: 3px dashed #64748b !important; }
+        .highlight-wwg { background-color: #dcfce7 !important; }
+        .dark .highlight-wwg { background-color: #065f46 !important; color: #a7f3d0; }
+        .highlight-nwg { background-color: #fef9c3 !important; }
+        .dark .highlight-nwg { background-color: #854d0e !important; color: #fef08a; }
         
-        /* Stijlen voor voegwoorden */
-        .highlight-voegwoord { background-color: #fce7f3; border-bottom: 3px solid #f472b6 !important; }
-        .dark .highlight-voegwoord { background-color: #831843; border-bottom: 3px solid #db2777 !important; }
+        .highlight-bwb { background-color: #f3e8ff !important; }
+        .dark .highlight-bwb { background-color: #3b0764 !important; }
+        .highlight-voorwerp { background-color: #f3f4f6 !important; }
+        .dark .highlight-voorwerp { background-color: #374151 !important; }
+        .highlight-nwd { background-color: #e2e8f0 !important; }
+        .dark .highlight-nwd { background-color: #475569 !important; }
+        
+        .highlight-voegwoord { background-color: #fce7f3 !important; }
+        .dark .highlight-voegwoord { background-color: #831843 !important; }
 
         .tag-container {
             display: inline-block;
@@ -49,7 +49,7 @@
             font-weight: bold;
             text-align: center;
             line-height: 1.2;
-            margin-bottom: 2px;
+            margin-top: 2px;
             min-height: 16px;
             min-width: 10px;
             border-radius: 4px;
@@ -82,12 +82,11 @@
                     </div>
                     
                     <div class="flex gap-2 relative">
-                        <button onclick="toggleSidebar()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 flex items-center gap-2 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                            <span class="hidden md:inline">Gids</span>
+                        <button onclick="toggleSidebar()" class="bg-blue-600 text-white p-2 rounded-lg shadow hover:bg-blue-700 flex items-center justify-center transition" title="Gids">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         </button>
                         
-                        <button id="settings-btn" onclick="toggleSettingsMenu()" class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:bg-gray-50 text-gray-700 dark:text-white transition shadow flex items-center justify-center">
+                        <button id="settings-btn" onclick="toggleSettingsMenu()" class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:bg-gray-50 text-gray-700 dark:text-white transition shadow flex items-center justify-center" title="Instellingen">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         </button>
 
@@ -99,7 +98,8 @@
                             <button onclick="toggleTheme()" class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center justify-between text-gray-700 dark:text-white transition">
                                 <span id="theme-text">Donker thema</span>
                                 <span id="theme-icon-svg">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                                 </span>
                             </button>
                         </div>
@@ -161,8 +161,8 @@
                     </div>
                 </div>
 
-                <!-- Zin -->
-                <div id="sentence-container" class="text-xl dark:text-white leading-loose min-h-[140px] p-6 border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg flex flex-wrap items-end gap-x-1 gap-y-8 shadow-inner"></div>
+                <!-- Zin (met items-start zodat woorden mooi uitlijnen bovenaan) -->
+                <div id="sentence-container" class="text-xl dark:text-white leading-loose min-h-[140px] p-6 border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg flex flex-wrap items-start gap-x-1 gap-y-8 shadow-inner"></div>
 
                 <!-- Zinsoort & Zinstructuur Selectie -->
                 <div id="zinsoort-structuur-container" class="mt-4 mb-6 flex flex-col gap-4 bg-gray-50 dark:bg-gray-800/80 p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors hidden">
@@ -185,7 +185,7 @@
                     </div>
                 </div>
 
-                <!-- Feedback -->
+                <!-- Feedback Area -->
                 <div id="feedback-area" class="mb-6 p-4 rounded-lg hidden">
                     <p id="feedback-text" class="text-sm font-medium"></p>
                 </div>
@@ -224,30 +224,30 @@
     </main>
 
     <!-- Sidebar Gids -->
-    <aside id="guide-sidebar" class="fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl sidebar-closed overflow-y-auto border-l border-gray-200 dark:border-gray-800 transition-colors z-50">
+    <aside id="guide-sidebar" class="fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl sidebar-closed overflow-y-auto border-l border-gray-200 dark:border-gray-800 transition-transform duration-300 z-50">
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-blue-800 dark:text-blue-400">Hulp bij Ontleden</h2>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-red-500 text-2xl transition">&times;</button>
+                <h2 class="text-2xl font-bold text-blue-900 dark:text-blue-400">Hulp bij Ontleden</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-red-500 text-3xl transition leading-none">&times;</button>
             </div>
             
-            <div class="space-y-6 text-sm">
+            <div class="space-y-8 text-sm">
                 
                 <section>
-                    <h3 class="font-bold text-gray-800 dark:text-gray-200 uppercase text-xs mb-2">Soort Zin & Zinstructuur</h3>
-                    <div class="bg-red-50 dark:bg-red-900/40 p-3 rounded border border-red-100 dark:border-red-900/50 space-y-2">
-                        <p class="text-gray-700 dark:text-gray-200"><b>WWG-zin:</b> Het onderwerp <i>doet</i> iets (actie).</p>
-                        <p class="text-gray-700 dark:text-gray-200"><b>NWG-zin:</b> Het onderwerp <i>is</i> of <i>wordt</i> iets (koppelwerkwoord + NWD).</p>
-                        <div class="h-px bg-red-200 dark:bg-red-800 my-2"></div>
-                        <p class="text-gray-700 dark:text-gray-200"><b>Enkelvoudig:</b> Heeft maar 1 Persoonsvorm (PV).</p>
-                        <p class="text-gray-700 dark:text-gray-200"><b>Samengesteld (Neven):</b> Twee gelijkwaardige <i>hoofdzinnen</i>. Je kunt ze losknippen en er een punt tussen zetten. De woordvolgorde blijft normaal!</p>
-                        <p class="text-gray-700 dark:text-gray-200"><b>Samengesteld (Onder):</b> Een hoofdzin + een <i>bijzin</i>. De bijzin kan niet alleen staan. <b>Let op:</b> In de bijzin springen <i>alle werkwoorden</i> helemaal naar achteren!</p>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 uppercase text-sm mb-2 tracking-wide">SOORT ZIN & ZINSTRUCTUUR</h3>
+                    <div class="space-y-3 text-gray-800 dark:text-gray-300">
+                        <p><b>WWG-zin:</b> Het onderwerp <i>doet</i> iets (actie).</p>
+                        <p><b>NWG-zin:</b> Het onderwerp <i>is</i> of <i>wordt</i> iets (koppelwerkwoord + NWD).</p>
+                        <div class="h-px bg-gray-200 dark:bg-gray-700 w-full my-2"></div>
+                        <p><b>Enkelvoudig:</b> Heeft maar 1 Persoonsvorm (PV).</p>
+                        <p><b>Samengesteld (Neven):</b> Twee gelijkwaardige <i>hoofdzinnen</i>. Je kunt ze losknippen en er een punt tussen zetten. De woordvolgorde blijft normaal!</p>
+                        <p><b>Samengesteld (Onder):</b> Een hoofdzin + een <i>bijzin</i>. De bijzin kan niet alleen staan. <b>Let op:</b> In de bijzin springen <i>alle werkwoorden</i> helemaal naar achteren!</p>
                     </div>
                 </section>
 
                 <section>
-                    <h3 class="font-bold text-pink-700 dark:text-pink-400 uppercase text-xs mb-2">Voeg- en Verwijswoorden</h3>
-                    <div class="space-y-2 text-gray-700 dark:text-gray-300">
+                    <h3 class="font-bold text-pink-700 dark:text-pink-400 uppercase text-sm mb-2 tracking-wide">VOEG- EN VERWIJSWOORDEN</h3>
+                    <div class="space-y-3 text-gray-800 dark:text-gray-300">
                         <p><b>NV (Nevenschikkend voegwoord):</b><br><i>en, of, want, maar, dus.</i><br>Deze plakken twee hoofdzinnen aan elkaar.</p>
                         <p><b>OV (Onderschikkend voegwoord):</b><br><i>omdat, terwijl, hoewel, zodat, nadat, voordat, doordat, opdat, tenzij, mits, zodra, toen, als, dat.</i><br>Deze starten een bijzin.</p>
                         <p><b>BVW (Betrekkelijk voornaamwoord):</b><br><i>die, dat, wie, wat, welke.</i><br>Verwijst terug naar een woord in de hoofdzin. Bv: De auto <i>die</i> daar rijdt...</p>
@@ -255,27 +255,42 @@
                 </section>
 
                 <section>
-                    <h3 class="font-bold text-blue-800 dark:text-blue-400 uppercase text-xs mb-2">De Gouden Volgorde</h3>
-                    <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300">
-                        <li>PV (Maak er een Ja/Nee vraag van)</li>
-                        <li>Gezegde (WWG of NWG)</li>
-                        <li>Onderwerp (Wie/Wat + PV?)</li>
-                        <li>Lijdend Voorwerp (Wie/wat + gezegde + O?)</li>
-                        <li>Meewerkend Voorwerp (Aan/voor wie?)</li>
-                        <li>BWB, VZV, HV</li>
-                    </ol>
+                    <h3 class="font-bold text-blue-800 dark:text-blue-400 uppercase text-sm mb-2 tracking-wide">DE GOUDEN VOLGORDE</h3>
+                    <div class="space-y-1 text-gray-800 dark:text-gray-300">
+                        <p><b>1. PV:</b> Maak er een Ja/Nee-vraag van.</p>
+                        <p><b>2. O (Onderwerp):</b> Wie of wat + PV?</p>
+                        <p><b>3. Gezegde:</b> WWG (alle werkwoorden) of NWG (koppelwerkwoord + NWD).</p>
+                        <p><b>4. LV (Lijdend Voorwerp):</b> Wie of wat + gezegde + O?</p>
+                        <p><b>5. MV (Meewerkend Voorwerp):</b> Aan wie / voor wie + gezegde + O + LV?</p>
+                        <p><b>6. HV (Handelend Voorwerp):</b> Door wie? (alleen in passieve zinnen).</p>
+                        <p><b>7. VZV (Voorzetselvoorwerp):</b> Vast voorzetsel (bv. wachten op).</p>
+                        <p><b>8. BWB (Bepalingen):</b> Waar, wanneer, hoe, waarom, waarmee?</p>
+                    </div>
                 </section>
 
                 <section>
-                    <h3 class="font-bold text-purple-800 dark:text-purple-400 uppercase text-xs mb-2">Bepalingen (BWB)</h3>
-                    <ul class="space-y-1 text-gray-700 dark:text-gray-300">
-                        <li><b>bep. tijd:</b> Wanneer?</li>
-                        <li><b>bep. plaats:</b> Waar?</li>
-                        <li><b>bep. wijze:</b> Hoe?</li>
-                        <li><b>bep. middel:</b> Waarmee? (instrument)</li>
-                        <li><b>bep. reden:</b> Waarom? (oorzaak)</li>
-                    </ul>
+                    <h3 class="font-bold text-teal-800 dark:text-teal-400 uppercase text-sm mb-2 tracking-wide">DE BASIS</h3>
+                    <div class="space-y-2 text-gray-800 dark:text-gray-300">
+                        <p><b>PV (Persoonsvorm):</b> Het werkwoord dat verandert als je de tijd van de zin aanpast. Bij een ja/nee-vraag staat dit woord altijd vooraan.</p>
+                        <p><b>O (Onderwerp):</b> Degene die de actie uitvoert of over wie de zin gaat.</p>
+                        <p><b>LV (Lijdend Voorwerp):</b> Dit is het zinsdeel dat de actie direct 'ondergaat'.</p>
+                        <p><b>MV (Meewerkend Voorwerp):</b> De ontvanger in de zin. Begint vaak met <i>aan</i> of <i>voor</i> (of je kunt dit erbij denken).</p>
+                        <p><b>HV (Handelend Voorwerp):</b> De echte 'dader' in een lijdende (passieve) zin. Begint altijd met het woord <i>door</i>.</p>
+                        <p><b>VZV (Voorzetselvoorwerp):</b> Een voorwerp dat altijd begint met een vast voorzetsel (bijv. wachten <i>op</i>, twijfelen <i>aan</i>).</p>
+                    </div>
                 </section>
+
+                <section>
+                    <h3 class="font-bold text-purple-800 dark:text-purple-400 uppercase text-sm mb-2 tracking-wide">BEPALINGEN (BWB)</h3>
+                    <div class="space-y-1 text-gray-800 dark:text-gray-300">
+                        <p><b>bep. tijd:</b> Wanneer?</p>
+                        <p><b>bep. plaats:</b> Waar?</p>
+                        <p><b>bep. wijze:</b> Hoe?</p>
+                        <p><b>bep. middel:</b> Waarmee? (instrument)</p>
+                        <p><b>bep. reden:</b> Waarom? (oorzaak)</p>
+                    </div>
+                </section>
+
             </div>
         </div>
     </aside>
@@ -291,31 +306,46 @@
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Kies welke zinsdelen je wilt oefenen in je sessie. De zinnen passen zich hier automatisch op aan!</p>
             
             <div class="space-y-6">
+
+                <!-- Basis (Vast) -->
+                <div>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 uppercase text-xs tracking-wider border-b border-gray-200 dark:border-gray-700 pb-1">Basis (Altijd aan)</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center space-x-2 text-gray-400 cursor-not-allowed">
+                            <input type="checkbox" checked disabled class="rounded border-gray-300">
+                            <span class="font-medium">Persoonsvorm (PV)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-400 cursor-not-allowed">
+                            <input type="checkbox" checked disabled class="rounded border-gray-300">
+                            <span class="font-medium">Onderwerp (O)</span>
+                        </label>
+                    </div>
+                </div>
                 
                 <!-- Zinstructuur -->
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50">
                     <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-3 uppercase text-xs tracking-wider border-b border-blue-200 dark:border-blue-800 pb-1">Zinstructuur (Enkel of Samengesteld)</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-ZINSTRUCTUUR_ENKEL" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-ZINSTRUCTUUR_ENKEL" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Enkelvoudige zinnen</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-ZINSTRUCTUUR_NEVEN" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-ZINSTRUCTUUR_NEVEN" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium text-sm">Samengesteld: Nevengeschikt (en, want...)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-ZINSTRUCTUUR_ONDER" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-ZINSTRUCTUUR_ONDER" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium text-sm">Samengesteld: Ondergeschikt (omdat, dat, die...)</span>
                         </label>
                         
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer mt-2 pt-2 border-t border-blue-200 dark:border-blue-800 sm:col-span-2">
-                            <input type="checkbox" id="chk-ZINSTRUCTUUR" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-ZINSTRUCTUUR" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium text-sm text-blue-700 dark:text-blue-300">Vraag Zinstructuur aan gebruiker (knoppen onderaan tonen)</span>
                         </label>
                         
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer pt-1 sm:col-span-2">
-                            <input type="checkbox" id="chk-VOEGWOORDEN" class="rounded w-4 h-4 border-pink-400 text-pink-600 focus:ring-pink-500">
+                            <input type="checkbox" id="chk-VOEGWOORDEN" onchange="validateSettings()" class="rounded w-4 h-4 border-pink-400 text-pink-600 focus:ring-pink-500">
                             <span class="font-medium text-sm text-pink-700 dark:text-pink-400">Voegwoorden / Verwijswoorden (NV, OV, BVW) aanduiden</span>
                         </label>
                     </div>
@@ -327,16 +357,16 @@
                     <div class="grid grid-cols-1 gap-3">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                                <input type="checkbox" id="chk-WWG" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="checkbox" id="chk-WWG" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="font-medium">Werkwoordelijk (WWG)</span>
                             </label>
                             <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                                <input type="checkbox" id="chk-NWG" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="checkbox" id="chk-NWG" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="font-medium">Naamwoordelijk (NWG)</span>
                             </label>
                         </div>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer mt-2 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <input type="checkbox" id="chk-ZINSOORT" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-ZINSOORT" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium text-sm">Vraag Zinsoort aan gebruiker (knoppen onderaan tonen)</span>
                         </label>
                     </div>
@@ -347,19 +377,19 @@
                     <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 uppercase text-xs tracking-wider border-b border-gray-200 dark:border-gray-700 pb-1">Voorwerpen</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-LV" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-LV" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Lijdend Vw (LV)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-MV" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-MV" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Meewerkend Vw (MV)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-HV" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-HV" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Handelend Vw (HV)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-VZV" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-VZV" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Voorzetsel Vw (VZV)</span>
                         </label>
                     </div>
@@ -370,39 +400,42 @@
                     <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 uppercase text-xs tracking-wider border-b border-gray-200 dark:border-gray-700 pb-1">Bepalingen (BWB)</h3>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-BEP_TIJD" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-BEP_TIJD" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Tijd</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-BEP_PLAATS" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-BEP_PLAATS" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Plaats</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-BEP_WIJZE" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-BEP_WIJZE" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Wijze</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-BEP_MIDDEL" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-BEP_MIDDEL" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Middel</span>
                         </label>
                         <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 cursor-pointer">
-                            <input type="checkbox" id="chk-BEP_REDEN" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" id="chk-BEP_REDEN" onchange="validateSettings()" class="rounded w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="font-medium">Reden</span>
                         </label>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-10 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-6">
-                <button onclick="closeSettingsModal()" class="px-5 py-2.5 rounded-xl font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Annuleren</button>
-                <button onclick="saveSettings()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 transition">Toepassen</button>
+            <div class="mt-10 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p id="settings-error" class="text-red-500 font-bold text-sm hidden"></p>
+                <div class="flex gap-3 w-full sm:w-auto justify-end">
+                    <button onclick="closeSettingsModal()" class="px-5 py-2.5 rounded-xl font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Annuleren</button>
+                    <button id="btn-save-settings" onclick="saveSettings()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Toepassen</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        // --- APPLICATIE CONFIGURATIE (Standaardinstellingen) ---
+        // --- APPLICATIE CONFIGURATIE ---
         let appConfig = {
             WWG: true, NWG: true, ZINSOORT: false, LV: true, MV: true, HV: true, VZV: true,
             BEP_TIJD: true, BEP_PLAATS: true, BEP_WIJZE: true, BEP_MIDDEL: true, BEP_REDEN: true,
@@ -449,7 +482,7 @@
                 document.getElementById('zinsoort-structuur-container').classList.remove('hidden');
             }
 
-            // Voegwoorden Knopjes in UI
+            // Voegwoorden Knopjes
             document.getElementById('voegwoorden-container').classList.toggle('hidden', !appConfig.VOEGWOORDEN);
         }
 
@@ -461,10 +494,31 @@
                 const chk = document.getElementById('chk-' + key);
                 if (chk) chk.checked = appConfig[key];
             }
+            validateSettings(); // Controleer direct bij openen
         }
 
         function closeSettingsModal() {
             document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function validateSettings() {
+            const btn = document.getElementById('btn-save-settings');
+            const err = document.getElementById('settings-error');
+            
+            const chkEnkel = document.getElementById('chk-ZINSTRUCTUUR_ENKEL')?.checked;
+            const chkNeven = document.getElementById('chk-ZINSTRUCTUUR_NEVEN')?.checked;
+            const chkOnder = document.getElementById('chk-ZINSTRUCTUUR_ONDER')?.checked;
+            
+            let hasStruct = chkEnkel || chkNeven || chkOnder;
+            
+            if (!hasStruct) {
+                btn.disabled = true;
+                err.classList.remove('hidden');
+                err.innerText = "Kies minstens één Zinstructuur.";
+            } else {
+                btn.disabled = false;
+                err.classList.add('hidden');
+            }
         }
 
         function saveSettings() {
@@ -472,10 +526,6 @@
             for (let key in appConfig) {
                 const chk = document.getElementById('chk-' + key);
                 if (chk) tempConfig[key] = chk.checked;
-            }
-
-            if (!tempConfig.ZINSTRUCTUUR_ENKEL && !tempConfig.ZINSTRUCTUUR_NEVEN && !tempConfig.ZINSTRUCTUUR_ONDER) {
-                tempConfig.ZINSTRUCTUUR_ENKEL = true;
             }
 
             appConfig = tempConfig;
@@ -746,7 +796,7 @@
             if (form === 'bijzin') {
                 sb.add(baseSubj, "O");
             } else if (form === 'bvw_bijzin') {
-                // In een BVW-bijzin laten we het onderwerp (O) weg, want het BVW wórdt het onderwerp/object!
+                // BVW vervangt O
             } else if (form === 'normaal') {
                 sb.add(baseSubj, "O");
                 sb.add((voice === 'actief' ? pv_actief : pv_passief), "PV,WWG");
@@ -770,7 +820,7 @@
                 sb.add(baseSubj, "O");
             }
 
-            // MIDDENVELD (Met strenge BWB limieten voor rustige zinnen)
+            // MIDDENVELD 
             let bepCount = 0;
             
             if (time && Math.random() > 0.3 && bepCount < maxBwbs) { sb.add(time, "BEP. TIJD"); bepCount++; }
@@ -797,7 +847,7 @@
             }
             if (c.type === 'vzv' && vzv) sb.add(vzv, "VZV");
             
-            // EINDE (Werkwoorden naar achteren in bijzinnen)
+            // EINDE
             if (form === 'bijzin' || form === 'bvw_bijzin') {
                 if (voice === 'passief') {
                     sb.add(part, "WWG_PART"); 
@@ -822,7 +872,6 @@
         function generateProSentences() {
             let pool = [];
             let maxAttempts = 15000; 
-            
             let normalConcepts = semanticConcepts.filter(c => c.type !== 'koppel_generic');
 
             while (pool.length < 1000 && maxAttempts > 0) {
@@ -847,7 +896,6 @@
                     pool.push({ text: s.text, roles: filterRoles(s.roles), zinType: clause.zinType, zinStructuur: 'ENKEL' });
                 
                 } else if (structType === 'NEVEN') {
-                    // Neven: Gebruik hetzelfde concept voor beide kanten voor 100% logica!
                     let c1 = rnd(normalConcepts);
                     let cl1 = buildSingleClause(c1, 'normaal', 1);
                     let cl2 = buildSingleClause(c1, 'normaal', 1);
@@ -864,15 +912,12 @@
                 
                 } else if (structType === 'ONDER') {
                     let c1 = rnd(normalConcepts);
-                    
                     let isBvw = Math.random() > 0.6; 
 
                     if (isBvw && (c1.type === 'trans' || c1.type === 'geven' || c1.type === 'vzv')) {
-                        // Speciale BVW formule: Hoofdzin + Algemene eigenschap (koppel_generic)
                         let cl1 = buildSingleClause(c1, 'normaal', 1);
                         let genericKoppel = semanticConcepts.find(c => c.type === 'koppel_generic');
-                        
-                        let cl2 = buildSingleClause(genericKoppel, 'bvw_bijzin', 0); // Geen extra bwbs in bijzin
+                        let cl2 = buildSingleClause(genericKoppel, 'bvw_bijzin', 0); 
                         
                         if (!cl1 || !cl2) continue;
                         
@@ -884,7 +929,6 @@
                         pool.push({ text: s.text, roles: filterRoles(s.roles), zinType: cl1.zinType, zinStructuur: 'ONDER' });
 
                     } else {
-                        // Standaard Ondergeschikte zin met EXACT hetzelfde concept voor perfecte logica
                         let cl1 = buildSingleClause(c1, 'normaal', 1);
                         let cl2 = buildSingleClause(c1, 'bijzin', 1);
                         
@@ -899,7 +943,6 @@
                     }
                 }
             }
-            
             return pool; 
         }
 
@@ -920,7 +963,6 @@
             if (appConfig.BEP_MIDDEL && roles['BEP. MIDDEL']) activeRoles['BEP. MIDDEL'] = roles['BEP. MIDDEL'];
             if (appConfig.BEP_REDEN && roles['BEP. REDEN']) activeRoles['BEP. REDEN'] = roles['BEP. REDEN'];
             
-            // Voegwoorden filter
             if (appConfig.VOEGWOORDEN) {
                 if (roles.NV) activeRoles.NV = roles.NV;
                 if (roles.OV) activeRoles.OV = roles.OV;
@@ -1022,7 +1064,7 @@
             
             words.forEach((word, i) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center';
+                wrapper.className = 'flex flex-col items-center justify-start';
                 const tagSpan = document.createElement('span');
                 tagSpan.className = 'tag-container';
                 tagSpan.id = `tag-${i}`;
@@ -1240,7 +1282,7 @@
                 if (missingUI) {
                     text.innerHTML = "<b>Goed op weg!</b> De woorden kloppen, maar vergeet niet de knoppen onderaan (Zinsoort / Structuur) aan te vinken!";
                 } else {
-                    text.innerHTML = "<b>Goed op weg!</b> De woorden die je hebt aangeduid kloppen perfect, maar je bent nog enkele zinsdelen vergeten te zoeken in deze zin.";
+                    text.innerHTML = "<b>Goed op weg!</b> Wat je hebt aangeduid klopt, maar je bent er nog een paar vergeten. Ontleed de hele zin!";
                 }
             } else {
                 if (!memory[currentIdx]) memory[currentIdx] = {};
@@ -1249,9 +1291,9 @@
                 
                 area.className = "mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800";
                 if (!uiOk) {
-                    text.innerHTML = "<b>Oei!</b> De woorden kloppen niet helemal OF je hebt de foute Zinsoort / Structuur gekozen. Bestudeer de Gids (rechts) nog eens!";
+                    text.innerHTML = "<b>Niet helemaal correct.</b> De woorden kloppen niet helemaal OF je hebt de foute Zinsoort / Structuur gekozen.";
                 } else {
-                    text.innerHTML = "<b>Er klopt iets niet.</b> Je hebt foute woorden aangeduid, of je hebt de verkeerde knop gebruikt voor een woord. Wis je foutjes met de Gom en probeer het nog eens.";
+                    text.innerHTML = "<b>Niet helemaal correct.</b> Er zitten foutjes in of je hebt verkeerde woorden aangeduid. Probeer opnieuw of klik op 'Oplossing'.";
                 }
             }
         }
